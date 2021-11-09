@@ -31,10 +31,18 @@ merged_seqtab <- seqtab %>%
   t %>%
   rowsum(clusters$cluster) %>%
   t
+
+# Representative sequences extracting
+newdf<-as.data.frame(cbind.data.frame(rownames(clusters),clusters$cluster,clusters$sequence))
+colnames(newdf)<-c("ASV","Number_of_ASV","sequence") 
+newdf.sort<-newdf %>% arrange(Number_of_ASV) %>% distinct(Number_of_ASV,.keep_all = TRUE)
+fas<-paste(">OTU",seq(1:nrow(newdf.sort)),"\t",newdf.sort$sequence,sep="")
+
 # Optional renaming of clusters to OTU<cluster #>
 colnames(merged_seqtab) <- paste0("OTU", colnames(merged_seqtab))
 
 write.csv(t(merged_seqtab), file="OTU_table.csv")
 write.csv(clusters, file="cluster_results.csv")
+write.csv(fas,file="representative_seqs.csv", row.names=FALSE, col.names=FALSE,quote = FALSE)
 
 
